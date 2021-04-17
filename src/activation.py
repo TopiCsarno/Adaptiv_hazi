@@ -12,3 +12,11 @@ def relu(Z):
 
 def relu_grad(Z):
     return Z > 0
+
+def softmax(Z, axis=1):
+    e = np.exp(Z - np.max(Z, axis=axis, keepdims=True))
+    return e / np.sum(e, axis=axis, keepdims=True)
+
+def softmax_grax(Z):
+    # TODO
+    return 1
