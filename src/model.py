@@ -40,7 +40,8 @@ class Model():
             accuracy = accuracy_categ_ce(y, y_hat)
             history.append((cost, accuracy))
 
-            if(verbose and ((i+1) % 10 == 0 or i==0)):
-                print("Iteration: {}\t cost: {:.5f}\taccuracy: {:.2f}%".format(i+1, cost, accuracy*100))
+            if (verbose):
+                if((i+1) % np.ceil(epoch/10) == 0 or i==0 or i+1==epoch):
+                    print("Iteration: {}\t cost: {:.5f}\taccuracy: {:.2f}%".format(i+1, cost, accuracy*100))
 
         return history
