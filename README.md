@@ -2,5 +2,4 @@
 
 Todo:
 
-- back up and refactor
 - dropout layer
