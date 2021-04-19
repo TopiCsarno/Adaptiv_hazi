@@ -2,8 +2,7 @@ import numpy as np
 
 class MaxPoolLayer():
 
-    def __init__(self, pool_size, stride, seed=99):
-        np.random.seed(seed)
+    def __init__(self, pool_size, stride):
         self.pool_size=pool_size
         self.stride=stride
         self.a_prev = None

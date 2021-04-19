@@ -2,10 +2,10 @@
 
 Todo:
 
-- create layer class -> standardize layers
+- create abstract class "Layer"
 - fix gradient descent "trainable layer" check
 - get rid of ReLu layer -> implement inside conv layer (optional)
-- mate dense layer have optional activation (if None, replace it with *1)
+- make dense layer have optional activation (if None, replace it with *1)
 - back up and refactor
 
 - merge one_class with model -> pick cost function?

@@ -16,7 +16,7 @@ class Model():
             activation = layer.forward_pass(activation)
         return activation
 
-    def fit(self, x, y, epoch, lr=0.01, bs=64, verbose=True):
+    def fit(self, x, y, epoch, lr=0.01, bs=64, verbose=True, debug=False):
         history = []
         for i in range(epoch):
 
@@ -33,7 +33,7 @@ class Model():
                     da_prev = layer.back_pass(da_curr)
 
                 # gradient descent
-                self.optimizer(self.layers, lr) 
+                self.optimizer(self.layers, lr, debug=debug) 
                 
             y_hat = self.predict(x)
             cost = cost_categ_ce(y, y_hat)
