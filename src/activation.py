@@ -1,5 +1,17 @@
 import numpy as np
 
+def set_activation(str):
+    if str is None:
+        return no_act, no_act_grad
+    if str == "relu":
+        return relu, relu_grad
+    elif str == "sigmoid":
+        return sigmoid, sigmoid_grad    
+    elif str == "softmax":
+        return softmax, softmax_grax
+    else:
+        raise Exception("Activation function is not supported")
+
 def sigmoid(Z):
     return 1/(1+np.exp(-Z))
 
@@ -19,4 +31,10 @@ def softmax(Z, axis=1):
 
 def softmax_grax(Z):
     # TODO
+    return 1
+
+def no_act(Z):
+    return Z
+
+def no_act_grad(Z):
     return 1

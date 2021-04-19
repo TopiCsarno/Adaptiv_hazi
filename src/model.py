@@ -1,14 +1,13 @@
 import numpy as np
-
-from src.metrics import accuracy_binary_ce, cost_binary_ce
-from src.metrics import accuracy_categ_ce, cost_categ_ce
+from src.metrics import choose_cost_fn
 from src.utils import generate_batches
 
 class Model():
 
-    def __init__(self, layers, optimizer):
+    def __init__(self, layers, optimizer, costfn):
         self.layers = layers
         self.optimizer = optimizer
+        self.costfn = costfn
 
     def predict(self, x):
         activation = x
@@ -17,27 +16,30 @@ class Model():
         return activation
 
     def fit(self, x, y, epoch, lr=0.01, bs=64, verbose=True, debug=False):
+        # set cost function and accuracy function
+        init_fn, cost_fn, acc_fn = choose_cost_fn(self.costfn)
+
         history = []
         for i in range(epoch):
 
             # train on batches
             for (x_batch, y_batch) in generate_batches(x, y, bs):
 
+                # forward pass
                 y_hat_batch = self.predict(x_batch)
 
-                # calc gradients
-                da_prev = y_hat_batch - y_batch
-
+                # back propogation
+                grads = init_fn(y_batch, y_hat_batch)
                 for layer in reversed(self.layers):
-                    da_curr = da_prev
-                    da_prev = layer.back_pass(da_curr)
+                    grads = layer.back_pass(grads)
 
                 # gradient descent
                 self.optimizer(self.layers, lr, debug=debug) 
                 
+            # calculate cost, accuracy
             y_hat = self.predict(x)
-            cost = cost_categ_ce(y, y_hat)
-            accuracy = accuracy_categ_ce(y, y_hat)
+            cost = cost_fn(y, y_hat)
+            accuracy = acc_fn(y, y_hat)
             history.append((cost, accuracy))
 
             if (verbose):

@@ -1,17 +1,21 @@
+from src.layers.layer import Layer
+from src.activation import set_activation
 import numpy as np 
 
-class ConvLayer():
+class ConvLayer(Layer):
 
-    def __init__(self, filters, kernel_shape, seed=99):
+    def __init__(self, filters, kernel_shape, activation=None, seed=99):
         np.random.seed(seed)
         self.w = np.random.randn(*kernel_shape, filters) * 0.1
         self.b = np.random.randn(filters) * 0.1
+        self.g, self.dg = set_activation(activation)
         self.dw = None
         self.db = None
         self.a_prev = None
+        self.g_out = None
 
     def weights(self):
-        return self.w, self.b
+        return self.w, self.b, self.dw, self.db
 
     def forward_pass(self, a_prev):
         self.a_prev = np.array(a_prev, copy=True)
@@ -33,9 +37,12 @@ class ConvLayer():
                     self.w[np.newaxis, :, :, :],
                     axis=(1, 2, 3)
                 ) 
-        return output + self.b
+        output += self.b
+        self.g_out = self.g(output)
+        return self.g_out
 
     def back_pass(self, da_curr):
+        da_curr = da_curr * self.dg(self.g_out)
         n, h_out, w_out, _ = da_curr.shape
         h_f, w_f, _, _ = self.w.shape
 

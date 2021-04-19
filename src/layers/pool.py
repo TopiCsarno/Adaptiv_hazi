@@ -1,19 +1,14 @@
+from src.layers.layer import Layer
 import numpy as np
 
-class MaxPoolLayer():
+class MaxPoolLayer(Layer):
 
     def __init__(self, pool_size, stride):
         self.pool_size=pool_size
         self.stride=stride
         self.a_prev = None
         self.cache = {}
-        # TODO - we dont need these params only for grad descent to work
-        self.w = None
-        self.b = None
-        self.dw = None
-        self.db = None
         
-
     def forward_pass(self, a_prev):
         self.a_prev = np.array(a_prev, copy=True)
 

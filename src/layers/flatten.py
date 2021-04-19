@@ -1,14 +1,10 @@
+from src.layers.layer import Layer
 import numpy as np 
 
-class FlattenLayer():
+class FlattenLayer(Layer):
 
     def __init__(self):
         self.a_prev_shape = None
-        # TODO grad fix
-        self.w = None
-        self.b = None
-        self.dw = None
-        self.db = None
 
     def forward_pass(self, a_prev):
         self.a_prev_shape = a_prev.shape

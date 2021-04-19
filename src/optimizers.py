@@ -1,8 +1,8 @@
+
 def gradient_descent(layers, lr=0.01, debug=False):
     for layer in layers:
 
-        params = (layer.w, layer.b, layer.dw, layer.db)
-        if any(elem is None for elem in params):
+        if layer.weights is None:
             continue
 
         if(debug):
