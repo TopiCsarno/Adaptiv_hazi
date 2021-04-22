@@ -2,5 +2,6 @@
 
 Todo:
 
-- back up and refactor
-- dropout layer
+- 1D conv példa notebook
+- refactor
+- adam optimizer, dropout layer...

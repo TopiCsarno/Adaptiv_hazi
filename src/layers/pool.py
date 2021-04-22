@@ -1,9 +1,11 @@
 from src.layers.layer import Layer
+from src.utils import inc
 import numpy as np
 
 class MaxPoolLayer(Layer):
 
     def __init__(self, pool_size, stride):
+        self.D = len(pool_size)
         self.pool_size=pool_size
         self.stride=stride
         self.a_prev = None
@@ -12,47 +14,79 @@ class MaxPoolLayer(Layer):
     def forward_pass(self, a_prev):
         self.a_prev = np.array(a_prev, copy=True)
 
-        n, h_in, w_in, c = a_prev.shape
-        h_pool, w_pool = self.pool_size
-        h_out = 1 + (h_in - h_pool) // self.stride
-        w_out = 1 + (w_in - w_pool) // self.stride
-        output = np.zeros((n, h_out, w_out, c))
+        n = a_prev.shape[0]
+        c = a_prev.shape[-1]
+        d_in = np.array(a_prev.shape[1:-1])
 
-        for i in range(h_out):
-            for j in range(w_out):
-                h_start = i * self.stride
-                h_end = h_start + h_pool
-                w_start = j * self.stride
-                w_end = w_start + w_pool
-                a_prev_slice = a_prev[:, h_start:h_end, w_start:w_end, :]
-                self.save_mask(x=a_prev_slice, cords=(i, j))
-                output[:, i, j, :] = np.max(a_prev_slice, axis=(1, 2))
+        d_pool = np.array(self.pool_size)
+        d_out = 1 + (d_in-d_pool) // self.stride
+        d_index = np.zeros_like(d_out)
+        output = np.zeros((n, *d_out, c))        
+
+        # max pool loop
+        i = len(d_out)-1
+        for _ in range(np.prod(d_out)):
+            d_start = d_index * self.stride
+            d_end = d_start + d_pool
+
+            # array slicing params
+            s1 = slice(0,n)
+            s2 = slice(0,c)
+            d_slices = [slice(*x) for x in zip(d_start,d_end)]
+
+            a_prev_slice = a_prev[(s1, *d_slices, s2)]
+            self.save_mask(x=a_prev_slice, cords=tuple(d_index))
+            output[(s1, *d_index, s2)] = np.max(a_prev_slice,
+                axis=tuple([x+1 for x in range(self.D)])
+            )
+
+            # increment pool loop
+            d_index[i] += 1
+            inc(i, d_index, d_out)
         return output
 
     def back_pass(self, da_curr):
         output = np.zeros(self.a_prev.shape)
-        _, h_out, w_out, _ = da_curr.shape
-        h_pool, w_pool = self.pool_size
 
-        for i in range(h_out):
-            for j in range(w_out):
-                h_start = i * self.stride
-                h_end = h_start + h_pool
-                w_start = j * self.stride
-                w_end = w_start + w_pool
+        n = da_curr.shape[0]
+        c = da_curr.shape[-1]
+        d_out = np.array(da_curr.shape[1:-1])
+        # _, h_out, w_out, _ = da_curr.shape
 
-                output[:, h_start:h_end, w_start:w_end, :] += \
-                    da_curr[:, i:i + 1, j:j + 1, :] * self.cache[(i, j)]  
+        d_pool = np.array(self.pool_size)
+        # h_pool, w_pool = self.pool_size
+
+        d_index = np.zeros_like(d_out)
+
+        output = np.zeros(self.a_prev.shape)
+
+        i = len(d_out)-1
+        for _ in range(np.prod(d_out)):
+            d_start = d_index * self.stride
+            d_end = d_start + d_pool
+            
+            s1 = slice(0,n)
+            s2 = slice(0,c)
+            d_slices = [slice(*x) for x in zip(d_start,d_end)]
+            d_slices2 = [slice(*x) for x in zip(d_index,d_index+1)]
+
+            output[(s1, *d_slices, s2)] += \
+                da_curr[(s1, *d_slices2, s2)] * self.cache[tuple(d_index)]
+
+            d_index[i] += 1
+            inc(i, d_index, d_out)
         return output
 
     def save_mask(self, x, cords):
         mask = np.zeros_like(x)
-        n, h, w, c = x.shape
-        x = x.reshape(n, h * w, c)
+
+        n = x.shape[0]
+        c = x.shape[-1]
+        dims = np.array(x.shape[1:-1])
+
+        x = x.reshape(n, np.prod(dims) , c)
         idx = np.argmax(x, axis=1)
 
         n_idx, c_idx = np.indices((n, c))
-        np.reshape(mask,(n, h*w, c))[n_idx, idx, c_idx] = 1
+        np.reshape(mask,(n, np.prod(dims), c))[n_idx, idx, c_idx] = 1
         self.cache[cords] = mask
-
-
