@@ -6,3 +6,4 @@ Todo:
 - refactor
 - adam optimizer, dropout layer...
 - dropout layer
+ 
