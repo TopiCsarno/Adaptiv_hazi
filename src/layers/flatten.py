@@ -1,3 +1,7 @@
+"""
+Flatten layer: az inputot "kilapítja" azaz átalakítja egy 1 dimenziós vektorrá.
+"""
+
 from src.layers.layer import Layer
 import numpy as np 
 

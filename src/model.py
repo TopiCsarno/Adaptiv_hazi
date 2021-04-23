@@ -1,3 +1,6 @@
+"""
+A Model osztály, ami magába foglalja a neurális háló rétegeit. Választható költség függvény és optimalizációs módszer (jelenleg csak gradient descent)
+"""
 import numpy as np
 from src.metrics import choose_cost_fn
 from src.utils import generate_batches
@@ -15,7 +18,7 @@ class Model():
             activation = layer.forward_pass(activation)
         return activation
 
-    def fit(self, x, y, epoch, lr=0.01, batch_size=64, verbose=True, debug=False):
+    def fit(self, x, y, epoch, lr=0.01, batch_size=64, verbose=True):
         # set cost function and accuracy function
         init_fn, cost_fn, acc_fn = choose_cost_fn(self.costfn)
 
@@ -34,7 +37,7 @@ class Model():
                     grads = layer.back_pass(grads)
 
                 # gradient descent
-                self.optimizer(self.layers, lr, debug=debug) 
+                self.optimizer(self.layers, lr) 
                 
             # calculate cost, accuracy
             y_hat = self.predict(x)
@@ -45,5 +48,4 @@ class Model():
             if (verbose):
                 if((i+1) % np.ceil(epoch/10) == 0 or i==0 or i+1==epoch):
                     print("Iteration: {}\t cost: {:.5f}\taccuracy: {:.2f}%".format(i+1, cost, accuracy*100))
-
         return history

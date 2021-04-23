@@ -1,3 +1,6 @@
+"""
+Aktivációs függvényeket és azok deriváltjait tartalmazza
+"""
 import numpy as np
 
 def set_activation(str):

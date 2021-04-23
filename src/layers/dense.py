@@ -1,3 +1,7 @@
+"""
+Fully connected (dense) layer implementációja. Tartalmazza az aktivációs függvényt is
+"""
+
 import numpy as np
 from src.activation import set_activation
 from src.layers.layer import Layer

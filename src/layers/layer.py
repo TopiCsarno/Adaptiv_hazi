@@ -1,3 +1,6 @@
+"""
+Absztrakt osztály, neurális háló rétegeihez. 
+"""
 from abc import ABC, abstractmethod
 
 class Layer(ABC):

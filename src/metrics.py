@@ -1,3 +1,8 @@
+"""
+Költségfüggvényeket és pontosság metrikákat tartalmaz:
+- BCE = Binary Cross Entropy cost function
+- CCE = Categocial Cross Entropy cost function
+"""
 import numpy as np
 
 def choose_cost_fn(str):
@@ -6,7 +11,7 @@ def choose_cost_fn(str):
     elif (str == "CCE"):
         return cost_categ_init, cost_categ_ce, accuracy_categ_ce
     else:
-        raise Exception("Loss funcion not supported")
+        raise Exception("Cost funcion not supported")
 
 def cost_binary_init(y, y_hat):
     return np.divide(1 - y, 1 - y_hat) - np.divide(y, y_hat)

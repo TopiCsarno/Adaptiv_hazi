@@ -1,3 +1,6 @@
+"""
+N dimenziós összevonó réteg implementációja. A pool_size paramétertől függően számolja az összevonás lépéseit.
+"""
 from src.layers.layer import Layer
 from src.utils import inc
 import numpy as np
@@ -54,13 +57,8 @@ class MaxPoolLayer(Layer):
         n = da_curr.shape[0]
         c = da_curr.shape[-1]
         d_out = np.array(da_curr.shape[1:-1])
-        # _, h_out, w_out, _ = da_curr.shape
-
         d_pool = np.array(self.pool_size)
-        # h_pool, w_pool = self.pool_size
-
         d_index = np.zeros_like(d_out)
-
         output = np.zeros(self.a_prev.shape)
 
         i = len(d_out)-1
@@ -80,6 +78,7 @@ class MaxPoolLayer(Layer):
             inc(i, d_index, d_out)
         return output
 
+    # A max érték pozícióját menti el az összevont területen belül. Back propogation során ez alapján vissza lehet állítani az az eredeti inputot
     def save_mask(self, x, cords):
         mask = np.zeros_like(x)
 
