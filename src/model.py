@@ -15,7 +15,7 @@ class Model():
             activation = layer.forward_pass(activation)
         return activation
 
-    def fit(self, x, y, epoch, lr=0.01, bs=64, verbose=True, debug=False):
+    def fit(self, x, y, epoch, lr=0.01, batch_size=64, verbose=True, debug=False):
         # set cost function and accuracy function
         init_fn, cost_fn, acc_fn = choose_cost_fn(self.costfn)
 
@@ -23,7 +23,7 @@ class Model():
         for i in range(epoch):
 
             # train on batches
-            for (x_batch, y_batch) in generate_batches(x, y, bs):
+            for (x_batch, y_batch) in generate_batches(x, y, batch_size):
 
                 # forward pass
                 y_hat_batch = self.predict(x_batch)

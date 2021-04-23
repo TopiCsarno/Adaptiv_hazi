@@ -12,3 +12,9 @@ def generate_batches(x, y, batch_size):
             x.take(indices=range(i, min(i + batch_size, x.shape[0])), axis=0),
             y.take(indices=range(i, min(i + batch_size, y.shape[0])), axis=0)
         )
+
+def inc(i, a, b):
+    if a[i] == b[i]:
+        a[i-1] += 1
+        a[i] = 0
+        inc((i-1), a, b)

@@ -5,7 +5,10 @@ import numpy as np
 class MaxPoolLayer(Layer):
 
     def __init__(self, pool_size, stride):
-        self.D = len(pool_size)
+        if (type(pool_size) == int):
+            self.D = 1
+        else:
+            self.D = len(pool_size)
         self.pool_size=pool_size
         self.stride=stride
         self.a_prev = None
