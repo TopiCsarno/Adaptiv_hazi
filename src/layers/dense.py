@@ -9,6 +9,11 @@ from src.layers.layer import Layer
 class DenseLayer(Layer):
     
     def __init__(self, nodes_prev, nodes_curr, activation=None, seed=99):
+        """
+        param int nodes_prev: Előző réteg neuronjainak száma.
+        param int nodes_curr: Ennek a rétegnek a neuronjainak száma.
+        param str activation: Aktivációs fv adható meg string alakban. Lehet "relu", "sigmoid", "softmax"
+        """
         np.random.seed(seed)
         self.w = np.random.randn(nodes_curr, nodes_prev) * 0.1
         self.b = np.random.randn(1, nodes_curr) * 0.1

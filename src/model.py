@@ -8,6 +8,11 @@ from src.utils import generate_batches
 class Model():
 
     def __init__(self, layers, optimizer, costfn):
+        """
+        param list layers: neurális háló rétegei egy listában felsorolva 
+        param class optimizer: optilamizációs módszer kiválasztása
+        param str costfn: lehet "BCE" (Binary Cross Entropy) vagy "CCE" (Categorical Cross Entropy)
+        """
         self.layers = layers
         self.optimizer = optimizer
         self.costfn = costfn

@@ -1,7 +1,7 @@
 # %%
 import sys
 sys.path.append("../")
-from src.layers.pool import MaxPoolLayer
+from src.layers.pool import MaxPoolLayerND
 import numpy as np
 import pickle
 
@@ -17,7 +17,7 @@ print(x.shape, X.shape)
 pool_size = (2,2)
 stride = 2
 
-layer = MaxPoolLayer(pool_size, stride)
+layer = MaxPoolLayerND(pool_size, stride)
 
 # %%
 da_curr = layer.forward_pass(X)

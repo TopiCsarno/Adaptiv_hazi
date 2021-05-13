@@ -5,9 +5,13 @@ from src.layers.layer import Layer
 from src.utils import inc
 import numpy as np
 
-class MaxPoolLayer(Layer):
+class MaxPoolLayerND(Layer):
 
-    def __init__(self, pool_size, stride):
+    def __init__(self, pool_size, stride=1):
+        """
+        param tuple pool_size: Az összevonás méreteit adhatjuk meg tuple formátumban pl: (2,2).
+        param tuple stride: Lépésköz adható meg egyes dimenziók irányában, vagy megadható int-ként is ha minden irányba azonos lépésközt szeretnénk.
+        """
         if (type(pool_size) == int):
             self.D = 1
         else:

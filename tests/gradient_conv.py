@@ -1,7 +1,7 @@
 # %%
 import sys
 sys.path.append("../")
-from src.layers.conv import ConvLayer
+from src.layers.conv import ConvLayerND
 import numpy as np
 np.random.seed(99)
 # %% 
@@ -16,7 +16,7 @@ input = np.random.randn(*input_shape)
 grads = np.random.randn(*grads_shape) * 0.1
 
 # nd conv layer
-layer = ConvLayer(filters,kernel_shape)
+layer = ConvLayerND(filters,kernel_shape)
 layer.forward_pass(input)
 layer.back_pass(grads)
 

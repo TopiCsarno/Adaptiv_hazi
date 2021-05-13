@@ -6,13 +6,20 @@ from src.activation import set_activation
 from src.utils import inc
 import numpy as np 
 
-class ConvLayer(Layer):
+class ConvLayerND(Layer):
 
-    def __init__(self, filters, kernel_shape, activation=None, seed=99):
+    def __init__(self, filters, kernel_shape, stride=1, activation=None, seed=99):
+        """
+        param int filters: Kernel által használt szűrők száma
+        param tuple kernel_shape: Kernel dimenzióit adja meg.
+        param tuple stride: Lépésköz adható meg egyes dimenziók irányában, vagy megadható int-ként is ha minden irányba azonos lépésközt szeretnénk.
+        param str activation: Aktivációs fv adható meg string alakban. Lehet "relu", "sigmoid", "softmax"
+        """
         np.random.seed(seed)
         self.D = len(kernel_shape)
         self.w = np.random.randn(*kernel_shape, filters) * 0.1
         self.b = np.random.randn(filters) * 0.1
+        self.stride = stride
         self.g, self.dg = set_activation(activation)
         self.dw = None
         self.db = None
@@ -27,17 +34,18 @@ class ConvLayer(Layer):
 
         # read input and kernel dimentions, generate output shape
         n = a_prev.shape[0]
+        n_f = self.w.shape[-1]
         d_in = np.array(a_prev.shape[1:-1])
 
-        n_f = self.w.shape[-1]
         d_f = np.array(self.w.shape[0:-2])
-        d_out = d_in - d_f + 1
-        d_start = np.zeros_like(d_out)
+        d_out = 1 + (d_in-d_f) // self.stride
+        d_index = np.zeros_like(d_out)
         output = np.zeros((n, *d_out, n_f))
 
         # convolution loop
         i = len(d_out)-1
         for _ in range(np.prod(d_out)):
+            d_start = d_index * self.stride
             d_end = d_start + d_f
 
             # array slicing parameters
@@ -46,15 +54,15 @@ class ConvLayer(Layer):
             d_slices = [slice(*x) for x in zip(d_start,d_end)]
 
             # calculate output
-            output[(s1, *d_start, s2)] = np.sum(
+            output[(s1, *d_index, s2)] = np.sum(
                 a_prev[(s1, *d_slices, s2, np.newaxis)] *
                 self.w[np.newaxis, ...],
                 axis=tuple([x+1 for x in range(self.D)])
             )
 
             # increment convol loop
-            d_start[i] += 1
-            inc(i, d_start, d_out)
+            d_index[i] += 1
+            inc(i, d_index, d_out)
 
         # add bias
         output += self.b
@@ -71,7 +79,7 @@ class ConvLayer(Layer):
         d_in = np.array(da_curr.shape[1:-1])
         n_f = self.w.shape[-1]
         d_f = np.array(self.w.shape[0:-2])
-        d_start = np.zeros_like(d_in)
+        d_index = np.zeros_like(d_in)
         output = np.zeros_like(self.a_prev)
 
         # dias gradients
@@ -82,13 +90,14 @@ class ConvLayer(Layer):
         self.dw = np.zeros_like(self.w)
         i = len(d_in)-1
         for _ in range(np.prod(d_in)):
+            d_start = d_index * self.stride
             d_end = d_start + d_f
 
             # array slicing parameters
             s1 = slice(0,n)
             s2 = slice(0,n_f)
             d_slices = [slice(*x) for x in zip(d_start, d_end)]
-            d_slices2 = [slice(*x) for x in zip(d_start, d_start+1)]
+            d_slices2 = [slice(*x) for x in zip(d_index, d_index+1)]
 
             # calculate output
             output[(s1, *d_slices, s2)] += np.sum(
@@ -104,10 +113,9 @@ class ConvLayer(Layer):
                 axis=0
             )
 
-
             # increment convol loop
-            d_start[i] += 1
-            inc(i, d_start, d_in)
+            d_index[i] += 1
+            inc(i, d_index, d_in)
 
         self.dw /= n
         return output
